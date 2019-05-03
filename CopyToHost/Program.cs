@@ -1,15 +1,45 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using JetBrains.OsTestFramework;
 
 namespace CopyToHost
 {
     class Program
     {
+        //        private static readonly string _assemblyDirectory = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().EscapedCodeBase).AbsolutePath);
+
+        private const string Ip = "192.168.0.84";
+        private const string UserName = "nunittest";
+        private const string Password = "123456";
+
+        private const string PathToNUnitTest = @"c:\Users\Eugene\source\repos\LeetCodeZigZag\ZigZagTest\bin\Debug";
+
         static void Main(string[] args)
         {
+            using (var operatingSystem = new RemoteEnvironment(Ip, UserName, Password,
+                @"c:\Users\Eugene\source\repos\PSTools\PsExec.exe"))
+            {
+
+                // Copy nUnit test to Guest PC
+                operatingSystem.CopyFileFromHostToGuest(
+                    PathToNUnitTest + @"\ZigZagConversion.zip",
+                    @"C:\_work");
+                // Unzip nUnit test on Guest PC
+                operatingSystem.WindowsShellInstance.DetachElevatedCommandInGuestNoRemoteOutput(
+                    @"7z.exe x -aoa -oc:\_work\Output c:\_work\ZigZagConversion.zip", TimeSpan.FromSeconds(1));
+                // Execute nUnit test on Guest PC
+                operatingSystem.WindowsShellInstance.DetachElevatedCommandInGuestNoRemoteOutput(
+                    @"nunit3-console --work=c:\_work\Output c:\_work\Output\ZigZagTest.dll", TimeSpan.FromSeconds(1));
+
+                // Verify that nunit execution test result (TestResult.xml) exist in "c:\_work\Output"
+                if (operatingSystem.FileExistsInGuest(@"c:\_work\Output\TestResult.xml"))
+                {
+                    // Copy Test Result from Guest to Host
+                    operatingSystem.CopyFileFromGuestToHost(
+                        @"c:\_work\Output\TestResult.xml",
+                        PathToNUnitTest);
+
+                }
+            }
         }
     }
 }
