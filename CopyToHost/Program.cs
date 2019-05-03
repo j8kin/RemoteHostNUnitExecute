@@ -5,8 +5,6 @@ namespace CopyToHost
 {
     class Program
     {
-        //        private static readonly string _assemblyDirectory = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().EscapedCodeBase).AbsolutePath);
-
         private const string Ip = "192.168.0.84";
         private const string UserName = "nunittest";
         private const string Password = "123456";
