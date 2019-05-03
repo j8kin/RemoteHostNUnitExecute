@@ -1,7 +1,7 @@
 ﻿using System;
 using JetBrains.OsTestFramework;
 
-namespace CopyToHost
+namespace RemoteHostNUnitExecute
 {
     class Program
     {
